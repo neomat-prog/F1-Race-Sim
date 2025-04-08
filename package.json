@@ -1,6 +1,6 @@
 {
   "name": "f1-sim",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Formula 1 racing simulation package with real data integration",
   "main": "src/index.js",
   "type": "module",
