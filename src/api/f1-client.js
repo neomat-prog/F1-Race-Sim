@@ -1,38 +1,60 @@
-import fetch from 'node-fetch';
-import { cache } from './cache.js';
+import fetch from "node-fetch";
+import { Team, Driver } from "../core/classes/index.js";
 
 export class F1Client {
   static async getSessionKey(circuit, year, session) {
-    const url = `https://api.openf1.org/v1/sessions?circuit_short_name=${circuit}&year=${year}&session_name=${session}`;
-    
-    if (cache.has(url)) return cache.get(url);
-    
-    const response = await fetch(url);
+    const response = await fetch(
+      `https://api.openf1.org/v1/sessions?circuit_short_name=${circuit}&year=${year}&session_name=${session}`
+    );
     const data = await response.json();
-    const sessionKey = data[0]?.session_key;
-    
-    if (sessionKey) {
-      cache.set(url, sessionKey);
-      return sessionKey;
-    }
-    
-    throw new Error('Session not found');
+    return data[0]?.session_key;
   }
 
   static async getDrivers(sessionKey) {
-    const url = `https://api.openf1.org/v1/drivers?session_key=${sessionKey}`;
-    
-    if (cache.has(url)) return cache.get(url);
-    
-    const response = await fetch(url);
+    const response = await fetch(
+      `https://api.openf1.org/v1/drivers?session_key=${sessionKey}`
+    );
     const data = await response.json();
-    const drivers = data.map(d => ({
-      name: d.full_name,
-      number: d.driver_number,
-      team: d.team_name
-    }));
-    
-    cache.set(url, drivers);
-    return drivers;
+
+    // Create teams map with default performance
+    const teams = new Map();
+
+    return data.map((driverData) => {
+      const teamName = driverData.team_name || "Unknown";
+
+      if (!teams.has(teamName)) {
+        teams.set(
+          teamName,
+          new Team(
+            teamName,
+            this.getDefaultPerformance(teamName) // Default car performance
+          )
+        );
+      }
+
+      return new Driver(
+        driverData.full_name,
+        teams.get(teamName),
+        85, // Default consistency
+        driverData.driver_number
+      );
+    });
+  }
+
+  static getDefaultPerformance(teamName) {
+    const performanceMap = {
+      "Red Bull": 95,
+      Mercedes: 93,
+      Ferrari: 92,
+      McLaren: 90,
+      "Aston Martin": 88,
+      Alpine: 87,
+      Williams: 85,
+      AlphaTauri: 84,
+      "Alfa Romeo": 83,
+      Haas: 82,
+    };
+
+    return performanceMap[teamName] || 85;
   }
 }

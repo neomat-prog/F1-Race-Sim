@@ -1,6 +1,6 @@
 // src/core/classes/Race.js
 
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 export class Track {
   constructor(name, minLapTime, maxLapTime) {
@@ -53,7 +53,9 @@ export class Race {
       await this.fetchQualifyingData();
     } else {
       this.driverStates.sort(
-        (a, b) => b.driver.team.carPerformance - a.driver.team.carPerformance
+        (a, b) =>
+          (b.driver.team?.carPerformance || 90) -
+          (a.driver.team?.carPerformance || 90)
       );
     }
   }
@@ -74,7 +76,9 @@ export class Race {
         state.position = driverData.position;
         driverPerformance.push({ state, lapTime: driverData.lap_time });
       } else {
-        console.warn(`No qualifying data for ${state.driver.name}; using default`);
+        console.warn(
+          `No qualifying data for ${state.driver.name}; using default`
+        );
         state.performance = state.driver.team.carPerformance;
       }
     }
@@ -122,7 +126,8 @@ export class Race {
     const performanceRange = maxPerformance - minPerformance;
     const lapTimeRange = this.track.maxLapTime - this.track.minLapTime;
     const carLapTime =
-      this.track.maxLapTime - ((performance - minPerformance) / performanceRange) * lapTimeRange;
+      this.track.maxLapTime -
+      ((performance - minPerformance) / performanceRange) * lapTimeRange;
 
     const tire = this.getTireProperties(state.currentTires);
     const tirePenalty =

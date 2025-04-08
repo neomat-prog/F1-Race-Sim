@@ -3,7 +3,6 @@
   "version": "1.0.6",
   "description": "Formula 1 racing simulation package with real data integration",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
@@ -15,6 +14,7 @@
   ],
   "author": "neomat-prog",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "lru-cache": "^7.14.0",
     "node-fetch": "^3.3.2"
