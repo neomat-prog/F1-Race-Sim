@@ -135,5 +135,10 @@ Race Results:
 4. Sergio Pérez      DNF
 5. Carlos Sainz      3101.334s
 ```
+
+Contributing:
+  I am very open for people to request commits, to my project. If you have any ideas that could be implemented or bugs squashed just send a pull request and I will be on my way to check it out!
+
 📚 API Documentation
 For full API reference and advanced usage, see the API Docs.
+https://openf1.org/?javascript#introduction
