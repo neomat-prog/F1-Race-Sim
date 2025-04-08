@@ -1,93 +1,68 @@
-# F1 Simulator Package
+🏎️ F1 Simulator Package
+A complete Formula 1 racing simulation package with real-world data integration, dynamic race features, and realistic race results.
 
-A complete Formula 1 racing simulation package with real-world data integration.
-
-## Installation
-```bash
-npm install f1-simulator
-```
-
-## Usage
-```javascript
-import { F1Client, Race, Track } from 'f1-simulator';
-
-async function runSimulation() {
-  const sessionKey = await F1Client.getSessionKey('Monza', 2023, 'Qualifying');
-  const drivers = await F1Client.getDrivers(sessionKey);
-  
-  const race = new Race({
-    track: new Track('Monza', 75, 95),
-    drivers,
-    laps: 53
-  });
-  
-  const results = await race.simulate();
-  console.log(results);
-}
-```
-
-## Features
-- Real F1 data integration
-- Tire degradation modeling
-- Safety car probability
-- DRS system simulation
-- Crash mechanics
-- Performance-based lap times
-
-## API Documentation
-See [API Reference](docs/API.md) for detailed documentation.
-
-
-Here's a complete usage guide for F1 simulator package:
-
-1. Installation
+📦 Installation
 bash
 Copy
+Edit
 npm install f1-simulator
-2. Basic Usage
+🚀 Quick Start
 javascript
 Copy
+Edit
 import { F1Client, Race, Track } from 'f1-simulator';
 
 async function runSimulation() {
   try {
-    // Get real F1 data
     const sessionKey = await F1Client.getSessionKey('Monza', 2023, 'Qualifying');
     const driversData = await F1Client.getDrivers(sessionKey);
 
-    // Create track instance
-    const track = new Track('Monza', 75, 95, 3); // Name, min lap, max lap, DRS zones
+    const track = new Track('Monza', 75, 95, 3); // name, minLapTime, maxLapTime, DRS zones
 
-     Initialize race
     const race = new Race({
       track,
       drivers: driversData,
       sessionKey,
       laps: 53,
-      weather: 'dry' // or 'wet'
+      weather: 'dry' // Options: 'dry', 'wet', or 'dynamic'
     });
 
-    // Run simulation
     await race.initialize();
     const results = race.simulate();
 
-    // Display results
     console.log('\nRace Results:');
     results.forEach((driver, index) => {
-      const status = driver.retired ? 'DNF' : driver.time.toFixed(3) + 's';
+      const status = driver.retired ? 'DNF' : `${driver.time.toFixed(3)}s`;
       console.log(`${index + 1}. ${driver.driver.padEnd(15)} ${status}`);
     });
-
   } catch (error) {
     console.error('Simulation error:', error.message);
   }
 }
 
 runSimulation();
-3. Custom Simulation
+🧰 Features
+✅ Real F1 data integration
+
+🛞 Tire degradation modeling
+
+🚨 Safety car deployment probabilities
+
+🌀 DRS system simulation
+
+💥 Crash and mechanical failure mechanics
+
+⏱️ Realistic lap time performance calculations
+
+🌦️ Dynamic weather changes
+
+🧠 Pit strategy planning
+
+🛠️ Custom Simulation
+Custom Drivers and Teams
 javascript
 Copy
-// Create custom drivers and teams
+Edit
 const redBull = new Team('Red Bull', 97);
 const mercedes = new Team('Mercedes', 95);
 
@@ -95,11 +70,15 @@ const customDrivers = [
   new Driver('Max Verstappen', redBull, 95, 1),
   new Driver('Lewis Hamilton', mercedes, 93, 44)
 ];
-
-// Create custom track
+Custom Track
+javascript
+Copy
+Edit
 const customTrack = new Track('Custom Circuit', 80, 110, 2);
-
-// Run custom simulation
+Run a Custom Race
+javascript
+Copy
+Edit
 const customRace = new Race({
   track: customTrack,
   drivers: customDrivers,
@@ -112,21 +91,23 @@ customRace.initialize().then(() => {
   console.log('\nCustom Race Results:');
   results.forEach(r => console.log(r));
 });
-4. Advanced Features
-Weather Simulation
+⚙️ Advanced Configuration
+🌦️ Weather Simulation
 javascript
 Copy
+Edit
 const race = new Race({
-  // ... other options
-  weather: 'dynamic', // Auto-changing weather
+  // ... other config
+  weather: 'dynamic',
   weatherChanges: [
     { lap: 10, newWeather: 'wet' },
     { lap: 20, newWeather: 'dry' }
   ]
 });
-Pit Strategies
+🛠️ Pit Strategy
 javascript
 Copy
+Edit
 const strategies = {
   'Max Verstappen': {
     15: 'hard',
@@ -139,25 +120,29 @@ const strategies = {
 };
 
 const race = new Race({
-  // ... other options
+  // ... other config
   pitStrategies: strategies
 });
-Safety Car Configuration
+🚓 Safety Car Configuration
 javascript
 Copy
+Edit
 import { SafetyCarSystem } from 'f1-simulator';
 
-// Modify safety car probabilities
 SafetyCarSystem.probabilities = {
   normal: 0.03,
   wet: 0.20,
   crash: 0.35
 };
-5. Output Example
+🧾 Output Example
+markdown
 Copy
+Edit
 Race Results:
 1. Max Verstappen    3089.452s
 2. Lewis Hamilton    3092.781s
 3. Charles Leclerc   3095.112s
 4. Sergio Pérez      DNF
 5. Carlos Sainz      3101.334s
+📚 API Documentation
+For full API reference and advanced usage, see the API Docs.
