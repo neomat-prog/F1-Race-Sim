@@ -26,7 +26,7 @@ export class Driver {
   }
 }
 
-export default class Race {
+export class Race {
   constructor(options) {
     this.track = options.track;
     this.drivers = options.drivers;
