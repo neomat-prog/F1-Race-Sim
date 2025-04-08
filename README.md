@@ -7,11 +7,8 @@ Copy
 Edit
 npm install f1-simulator
 🚀 Quick Start
-javascript
-Copy
-Edit
 import { F1Client, Race, Track } from 'f1-simulator';
-
+```
 async function runSimulation() {
   try {
     const sessionKey = await F1Client.getSessionKey('Monza', 2023, 'Qualifying');
@@ -41,6 +38,7 @@ async function runSimulation() {
 }
 
 runSimulation();
+```
 🧰 Features
 ✅ Real F1 data integration
 
