@@ -137,3 +137,4 @@ Race Results:
 ```
 📚 API Documentation
 For full API reference and advanced usage, see the API Docs.
+https://openf1.org/?javascript#introduction
