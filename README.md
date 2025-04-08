@@ -58,9 +58,7 @@ runSimulation();
 
 🛠️ Custom Simulation
 Custom Drivers and Teams
-javascript
-Copy
-Edit
+```javascript
 const redBull = new Team('Red Bull', 97);
 const mercedes = new Team('Mercedes', 95);
 
@@ -68,15 +66,12 @@ const customDrivers = [
   new Driver('Max Verstappen', redBull, 95, 1),
   new Driver('Lewis Hamilton', mercedes, 93, 44)
 ];
+```
 Custom Track
-javascript
-Copy
-Edit
+```
 const customTrack = new Track('Custom Circuit', 80, 110, 2);
 Run a Custom Race
-javascript
-Copy
-Edit
+
 const customRace = new Race({
   track: customTrack,
   drivers: customDrivers,
@@ -89,11 +84,10 @@ customRace.initialize().then(() => {
   console.log('\nCustom Race Results:');
   results.forEach(r => console.log(r));
 });
+```
 ⚙️ Advanced Configuration
 🌦️ Weather Simulation
-javascript
-Copy
-Edit
+```
 const race = new Race({
   // ... other config
   weather: 'dynamic',
@@ -102,10 +96,9 @@ const race = new Race({
     { lap: 20, newWeather: 'dry' }
   ]
 });
+```
 🛠️ Pit Strategy
-javascript
-Copy
-Edit
+```
 const strategies = {
   'Max Verstappen': {
     15: 'hard',
@@ -116,15 +109,15 @@ const strategies = {
     25: 'medium'
   }
 };
-
+```
+```
 const race = new Race({
   // ... other config
   pitStrategies: strategies
 });
+```
 🚓 Safety Car Configuration
-javascript
-Copy
-Edit
+```
 import { SafetyCarSystem } from 'f1-simulator';
 
 SafetyCarSystem.probabilities = {
@@ -132,15 +125,15 @@ SafetyCarSystem.probabilities = {
   wet: 0.20,
   crash: 0.35
 };
+```
 🧾 Output Example
-markdown
-Copy
-Edit
+```
 Race Results:
 1. Max Verstappen    3089.452s
 2. Lewis Hamilton    3092.781s
 3. Charles Leclerc   3095.112s
 4. Sergio Pérez      DNF
 5. Carlos Sainz      3101.334s
+```
 📚 API Documentation
 For full API reference and advanced usage, see the API Docs.
