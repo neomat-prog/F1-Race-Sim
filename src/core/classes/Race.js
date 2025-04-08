@@ -1,107 +1,167 @@
-import { TireManager, SafetyCarSystem, DRSSystem } from '../utils/config.js';
-import { calculateVariation } from '../utils/helpers.js';
+// src/core/classes/Race.js
+
+import fetch from 'node-fetch';
+
+export class Track {
+  constructor(name, minLapTime, maxLapTime) {
+    this.name = name;
+    this.maxLapTime = maxLapTime;
+    this.minLapTime = minLapTime;
+  }
+}
+
+export class Team {
+  constructor(name, carPerformance) {
+    this.name = name;
+    this.carPerformance = carPerformance;
+  }
+}
+
+export class Driver {
+  constructor(name, team, consistency, driverNumber) {
+    this.name = name;
+    this.team = team;
+    this.consistency = consistency;
+    this.driverNumber = driverNumber;
+  }
+}
 
 export class Race {
   constructor(options) {
     this.track = options.track;
     this.drivers = options.drivers;
-    this.weather = options.weather || 'dry';
+    this.weather = options.weather || "dry";
     this.laps = options.laps || 50;
+    this.pitStrategies = options.pitStrategies || {};
     this.sessionKey = options.sessionKey;
-    this.drsSystem = new DRSSystem(this.track);
-    
-    this.driverStates = this.drivers.map(driver => ({
+    this.driverStates = this.drivers.map((driver) => ({
       driver,
       totalTime: 0,
-      currentTires: 'medium',
+      currentTires: "medium",
       lapsOnTires: 0,
       retired: false,
       performance: null,
-      crashProbability: 0.02
     }));
+    this.currentLap = 0;
+    this.events = [];
+    this.isSafetyCarOut = false;
+    this.safetyCarLapsRemaining = 0;
   }
 
   async initialize() {
-    if (this.sessionKey) await this.fetchQualifyingData();
+    if (this.sessionKey) {
+      await this.fetchQualifyingData();
+    } else {
+      this.driverStates.sort(
+        (a, b) => b.driver.team.carPerformance - a.driver.team.carPerformance
+      );
+    }
   }
 
   async fetchQualifyingData() {
     const url = `https://api.openf1.org/v1/qualifying?session_key=${this.sessionKey}`;
     const response = await fetch(url);
     const qualifyingData = await response.json();
-    
-    const qualMap = new Map(qualifyingData.map(d => [d.driver_number, d]));
-    this.driverStates.forEach(state => {
-      const data = qualMap.get(state.driver.driverNumber);
-      if (data) {
-        state.qualifyingTime = data.lap_time;
-        state.gridPosition = data.position;
+
+    const qualifyingMap = new Map(
+      qualifyingData.map((d) => [d.driver_number, d])
+    );
+
+    const driverPerformance = [];
+    for (const state of this.driverStates) {
+      const driverData = qualifyingMap.get(state.driver.driverNumber);
+      if (driverData) {
+        state.position = driverData.position;
+        driverPerformance.push({ state, lapTime: driverData.lap_time });
+      } else {
+        console.warn(`No qualifying data for ${state.driver.name}; using default`);
+        state.performance = state.driver.team.carPerformance;
       }
-    });
+    }
+
+    this.driverStates.sort((a, b) => a.position - b.position);
+
+    if (driverPerformance.length > 0) {
+      const lapTimes = driverPerformance.map((dp) => dp.lapTime);
+      const minLapTime = Math.min(...lapTimes);
+      const maxLapTime = Math.max(...lapTimes);
+      this.track.minLapTime = minLapTime;
+      this.track.maxLapTime = maxLapTime;
+
+      for (const { state, lapTime } of driverPerformance) {
+        state.performance =
+          80 + 20 * ((maxLapTime - lapTime) / (maxLapTime - minLapTime));
+      }
+    }
   }
 
   simulate() {
-    for (let lap = 1; lap <= this.laps; lap++) {
-      this.processLap(lap);
+    while (this.currentLap < this.laps) {
+      this.currentLap++;
+      this.checkEvents();
+      this.driverStates.forEach((state) => {
+        if (state.retired) return;
+        const strategy = this.pitStrategies[state.driver.name];
+        if (strategy && strategy[this.currentLap]) {
+          this.performPitStop(state, strategy[this.currentLap]);
+        }
+        const lapTime = this.calculateLapTime(state);
+        state.totalTime += lapTime;
+        state.lapsOnTires++;
+      });
+      this.updatePositions();
     }
-    return this.getResults();
+    return this.generateResults();
   }
 
-  processLap(lap) {
-    this.drsSystem.updateDRSStatus(lap, this.driverStates);
-    const safetyCar = SafetyCarSystem.checkSafetyCar(this.weather, this.countCrashes());
-    
-    this.driverStates.forEach(state => {
-      if (state.retired) return;
-      
-      this.checkTireWear(state);
-      this.checkCrash(state);
-      
-      const lapTime = this.calculateLapTime(state, safetyCar);
-      state.totalTime += lapTime;
-      state.lapsOnTires++;
-    });
-    
+  calculateLapTime(state) {
+    const { driver } = state;
+    const performance = state.performance || driver.team.carPerformance;
+    const minPerformance = 80;
+    const maxPerformance = 100;
+    const performanceRange = maxPerformance - minPerformance;
+    const lapTimeRange = this.track.maxLapTime - this.track.minLapTime;
+    const carLapTime =
+      this.track.maxLapTime - ((performance - minPerformance) / performanceRange) * lapTimeRange;
+
+    const tire = this.getTireProperties(state.currentTires);
+    const tirePenalty =
+      tire.baseOffset + tire.degradationRate * state.lapsOnTires;
+
+    const weatherMultiplier = this.getWeatherMultiplier();
+
+    let baseLapTime = (carLapTime + tirePenalty) * weatherMultiplier;
+
+    if (this.isSafetyCarOut) {
+      baseLapTime += 20;
+    }
+
+    const variation = 0.5 * (1 - driver.consistency / 100);
+    const randomVariation = (Math.random() * 2 - 1) * variation;
+
+    return baseLapTime + randomVariation;
+  }
+
+  // Placeholder methods
+  checkEvents() {}
+  performPitStop(state, tireType) {
+    state.currentTires = tireType;
+    state.lapsOnTires = 0;
+  }
+  getTireProperties(tireType) {
+    return { baseOffset: 0.5, degradationRate: 0.1 };
+  }
+  getWeatherMultiplier() {
+    return this.weather === "dry" ? 1 : 1.1;
+  }
+  updatePositions() {
     this.driverStates.sort((a, b) => a.totalTime - b.totalTime);
   }
-
-  calculateLapTime(state, safetyCar) {
-    const tire = TireManager.getTireProperties(state.currentTires);
-    const baseTime = this.track.minLapTime + 
-      (this.track.maxLapTime - this.track.minLapTime) * 
-      (1 - state.performance / 100);
-    
-    let totalTime = baseTime + 
-      tire.degradation * state.lapsOnTires +
-      calculateVariation(state.driver.consistency);
-    
-    if (safetyCar) totalTime *= 1.2;
-    if (this.drsSystem.isActive) totalTime *= 0.995;
-    
-    return totalTime;
-  }
-
-  checkTireWear(state) {
-    const maxLaps = TireManager.compounds[state.currentTires].lifespan;
-    if (state.lapsOnTires > maxLaps) {
-      state.crashProbability += 0.1;
-    }
-  }
-
-  checkCrash(state) {
-    if (Math.random() < state.crashProbability) {
-      state.retired = true;
-    }
-  }
-
-  getResults() {
-    return this.driverStates
-      .sort((a, b) => a.totalTime - b.totalTime)
-      .map(state => ({
-        driver: state.driver.name,
-        time: state.totalTime,
-        retired: state.retired,
-        tires: state.currentTires
-      }));
+  generateResults() {
+    return this.driverStates.map((state) => ({
+      driver: state.driver.name,
+      totalTime: state.totalTime,
+      retired: state.retired,
+    }));
   }
 }

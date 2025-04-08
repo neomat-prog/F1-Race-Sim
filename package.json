@@ -1,19 +1,38 @@
 {
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "name": "f1-race-simulator",
+  "name": "f1-simulator",
   "version": "1.0.0",
-  "main": "index.js",
-  "devDependencies": {},
+  "description": "Formula 1 racing simulation package with real data integration",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
-  "keywords": [],
+  "keywords": [
+    "f1",
+    "racing",
+    "simulation",
+    "formula1"
+  ],
   "author": "neomat-prog",
-  "license": "ISC",
-  "description": "A lightweight F1 race simulator"
-  
+  "license": "MIT",
+  "dependencies": {
+    "lru-cache": "^7.14.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/preset-env": "^7.26.9",
+    "babel-jest": "^29.7.0",
+    "core-js": "^3.27.2",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/f1-simulator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/f1-simulator/issues"
+  }
 }
