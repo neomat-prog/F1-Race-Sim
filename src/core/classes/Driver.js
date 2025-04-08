@@ -1,4 +1,4 @@
-export class Driver {
+export default class Driver {
   constructor(name, team, consistency, driverNumber) {
     this.name = name;
     this.team = team;
