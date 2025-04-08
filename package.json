@@ -30,9 +30,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/f1-simulator.git"
+    "url": "https://github.com/neomat-prog/f1-simulator.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/f1-simulator/issues"
+    "url": "https://github.com/neomat-prog/f1-simulator/issues"
   }
 }
