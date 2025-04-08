@@ -1,4 +1,6 @@
-export { default as Race } from './Race.js';
-export { default as Track } from './Track.js';
-export { default as Driver } from './Driver.js';
-export { default as Team } from './Team.js';
+import Race from './Race.js';
+import Track from './Track.js';
+import Driver from './Driver.js';
+import Team from './Team.js';
+
+export { Race, Track, Driver, Team };

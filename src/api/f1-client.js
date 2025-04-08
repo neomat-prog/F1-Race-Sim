@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
-import { Team, Driver } from "../core/classes/index.js";
+import Team from "../core/classes/Team.js";
+import Driver from "../core/classes/Driver.js";
 
 export class F1Client {
   static async getSessionKey(circuit, year, session) {

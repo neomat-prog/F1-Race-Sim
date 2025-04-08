@@ -6,10 +6,6 @@
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
-  "exports": {
-    ".": "./src/index.js",
-    "./package.json": "./package.json"
-  },
   "keywords": [
     "f1",
     "racing",
@@ -19,6 +15,10 @@
   "author": "neomat-prog",
   "license": "MIT",
   "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "lru-cache": "^7.14.0",
     "node-fetch": "^3.3.2"
